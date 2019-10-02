@@ -13,6 +13,57 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  TextEditingController weightController = TextEditingController();
+  TextEditingController heightController = TextEditingController();
+  String _infoText = "Informe seus dados";
+
+  void _resetFields() {
+    weightController.text = "";
+    heightController.text = "";
+    setState(() {
+      _infoText = "";
+    });
+  }
+
+  void _calculate() {
+    bool h = true, w = true;
+    double weight = 0;
+    double height = 0;
+    double imc = 0;
+    setState(() {
+      if (heightController.text.trim().isEmpty &&
+          weightController.text.trim().isEmpty) {
+        print("a");
+        h = true;
+        w = true;
+        _infoText = "Necessário informar peso e altura";
+      } else {
+        print("b");
+        if (weightController.text.trim().isEmpty) {
+          w = false;
+          print("c");
+          _infoText = "Necessário informar peso!";
+        }
+        if (heightController.text.trim().isEmpty) {
+          print("d");
+          h = false;
+          _infoText = "Necessário informar altura!";
+        }
+      }
+
+      if (h && w) {
+        print("e");
+        weight = double.parse(weightController.text);
+        height = double.parse(heightController.text) / 100;
+        imc = weight / (height * height);
+        print(imc);
+      }
+      if (imc < 18.6) {
+        _infoText = "Abaixo do Peso (${imc.toStringAsPrecision(3)})";
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +74,9 @@ class _HomeState extends State<Home> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.refresh),
-              onPressed: () {},
+              onPressed: () {
+                _resetFields();
+              },
             )
           ],
         ),
@@ -47,6 +100,7 @@ class _HomeState extends State<Home> {
                     labelStyle: TextStyle(color: Colors.green)),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.green, fontSize: 25.0),
+                controller: weightController,
               ),
               TextField(
                 keyboardType: TextInputType.number,
@@ -55,13 +109,16 @@ class _HomeState extends State<Home> {
                     labelStyle: TextStyle(color: Colors.green)),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.green, fontSize: 25.0),
+                controller: heightController,
               ),
               Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: Container(
                   height: 50.0,
                   child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _calculate();
+                    },
                     child: Text(
                       "Calcular",
                       style: TextStyle(color: Colors.white, fontSize: 25.0),
@@ -71,7 +128,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               Text(
-                "Info",
+                _infoText,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.green, fontSize: 25.0),
               )
